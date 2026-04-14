@@ -1,0 +1,866 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Search: Putin – OCCRP</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Merriweather:ital,wght@0,400;0,700;0,900;1,400&family=Source+Sans+3:wght@400;500;600;700&display=swap" rel="stylesheet" />
+
+  <style>
+    /* ── CSS Variables ─────────────────────────────────────────────── */
+    :root {
+      --red:        #C8102E;
+      --red-dark:   #9e0c23;
+      --red-light:  #f9e8eb;
+      --charcoal:   #1a1a1a;
+      --mid-grey:   #555555;
+      --light-grey: #e8e8e8;
+      --bg:         #f4f2ef;
+      --white:      #ffffff;
+      --wiki-blue:  #3366cc;
+      --wiki-bg:    #f8f9fa;
+      --ai-bg:      #fff8f8;
+      --tag-invest: #C8102E;
+      --tag-report: #C8102E;
+      --tag-daily:  #C8102E;
+      --tag-analysis:#C8102E;
+
+      --font-serif: 'Merriweather', Georgia, serif;
+      --font-sans:  'Source Sans 3', 'Helvetica Neue', sans-serif;
+      --max-width:  1120px;
+      --radius:     4px;
+    }
+
+    /* ── Reset ─────────────────────────────────────────────────────── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: var(--font-sans);
+      font-size: 16px;
+      background: var(--bg);
+      color: var(--charcoal);
+      line-height: 1.6;
+    }
+    a { color: inherit; text-decoration: none; }
+    img { display: block; max-width: 100%; }
+
+
+
+    /* ── Page shell ────────────────────────────────────────────────── */
+    .page-wrap {
+      max-width: var(--max-width);
+      margin: 0 auto;
+      padding: 32px 24px 64px;
+      display: grid;
+      grid-template-columns: 260px 1fr;
+      grid-template-rows: auto auto 1fr;
+      gap: 24px 32px;
+      align-items: start;
+    }
+
+    /* Full-width rows */
+    .search-meta    { grid-column: 1 / -1; }
+    .filter-bar-wrap { grid-column: 1 / -1; }
+
+    /* Column assignments */
+    .sidebar { grid-column: 1; grid-row: 3; position: sticky; top: 24px; }
+    main     { grid-column: 2; grid-row: 3; }
+    .filter-bar-wrap {
+      grid-column: 1 / -1;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-bottom: 4px;
+    }
+    .filter-bar-label {
+      font-family: var(--font-sans);
+      font-size: 12px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 1.2px;
+      color: var(--charcoal);
+      flex-shrink: 0;
+      margin-right: 4px;
+    }
+    .filter-tabs {
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+      position: relative;
+    }
+    .filter-tab {
+      position: relative;
+    }
+    .filter-tab-btn {
+      background: #e8e4df;
+      border: none;
+      border-radius: 999px;
+      padding: 8px 18px;
+      font-family: var(--font-sans);
+      font-size: 13.5px;
+      font-weight: 500;
+      color: var(--charcoal);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      transition: background .15s, color .15s;
+      white-space: nowrap;
+    }
+    .filter-tab-btn:hover { background: #d8d3cc; }
+    .filter-tab-btn.open {
+      background: #ccc7bf;
+      font-weight: 600;
+    }
+    .filter-tab-btn .tab-prefix {
+      font-size: 10px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: .8px;
+      color: var(--mid-grey);
+    }
+    .filter-tab-btn .chevron {
+      font-size: 10px;
+      margin-left: 2px;
+      transition: transform .2s;
+    }
+    .filter-tab-btn.open .chevron { transform: rotate(180deg); }
+
+    .filter-dropdown {
+      display: none;
+      position: absolute;
+      top: calc(100% + 6px);
+      left: 0;
+      background: var(--white);
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      box-shadow: 0 6px 20px rgba(0,0,0,.12);
+      padding: 14px 16px;
+      min-width: 220px;
+      z-index: 200;
+    }
+    .filter-dropdown.open { display: block; }
+    .filter-dropdown .filter-option {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 14px;
+      padding: 5px 0;
+      cursor: pointer;
+      color: var(--charcoal);
+    }
+    .filter-dropdown .filter-option input { accent-color: var(--red); cursor: pointer; }
+    .filter-dropdown .filter-option-count {
+      margin-left: auto;
+      font-size: 11px;
+      color: #888;
+      background: #eee;
+      padding: 1px 7px;
+      border-radius: 10px;
+      font-weight: 600;
+    }
+
+    /* ── Search meta ───────────────────────────────────────────────── */
+    .search-meta {
+      display: flex;
+      align-items: baseline;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+    .search-meta h1 {
+      font-family: var(--font-serif);
+      font-size: 24px;
+      font-weight: 900;
+      color: var(--charcoal);
+    }
+    .search-meta h1 em {
+      color: var(--red);
+      font-style: normal;
+    }
+    .search-meta .result-count {
+      font-size: 13px;
+      color: var(--mid-grey);
+      font-weight: 500;
+    }
+
+    /* ── Section headings ──────────────────────────────────────────── */
+    .section-label {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 14px;
+    }
+    .section-label h2 {
+      font-family: var(--font-sans);
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 1.2px;
+      color: var(--mid-grey);
+    }
+    .section-label .badge {
+      font-size: 10px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: .8px;
+      padding: 2px 8px;
+      border-radius: 2px;
+    }
+    .badge-experimental {
+      background: #fff3cd;
+      color: #856404;
+      border: 1px solid #ffc107;
+    }
+    .badge-wiki {
+      background: #e8eaf6;
+      color: #3949ab;
+      border: 1px solid #c5cae9;
+    }
+    .section-label::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: var(--light-grey);
+    }
+
+    /* ── AI Summary card ───────────────────────────────────────────── */
+    .ai-card {
+      background: var(--white);
+      border: 1px solid #e0d0d2;
+      border-left: 4px solid var(--red);
+      border-radius: var(--radius);
+      padding: 22px 26px;
+      margin-bottom: 28px;
+      animation: fadeUp .4s ease both;
+    }
+    .ai-card-header {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+    .ai-card-title {
+      font-family: var(--font-serif);
+      font-size: 16px;
+      font-weight: 700;
+      color: var(--charcoal);
+      line-height: 1.3;
+    }
+    .ai-icon {
+      flex-shrink: 0;
+      width: 32px;
+      height: 32px;
+      background: var(--red-light);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 16px;
+    }
+    .ai-highlights {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+    .ai-highlights li {
+      display: flex;
+      gap: 12px;
+      font-size: 14.5px;
+      line-height: 1.6;
+      color: var(--charcoal);
+    }
+    .ai-highlights li::before {
+      content: '';
+      flex-shrink: 0;
+      width: 18px;
+      height: 18px;
+      margin-top: 3px;
+      background: var(--red);
+      mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20'%3E%3Cpath d='M10 2a8 8 0 100 16A8 8 0 0010 2zm3.707 6.293l-4 4a1 1 0 01-1.414 0l-2-2a1 1 0 011.414-1.414L9 10.172l3.293-3.293a1 1 0 011.414 1.414z'/%3E%3C/svg%3E");
+      mask-size: contain;
+      mask-repeat: no-repeat;
+      -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20'%3E%3Cpath d='M10 2a8 8 0 100 16A8 8 0 0010 2zm3.707 6.293l-4 4a1 1 0 01-1.414 0l-2-2a1 1 0 011.414-1.414L9 10.172l3.293-3.293a1 1 0 011.414 1.414z'/%3E%3C/svg%3E");
+      -webkit-mask-size: contain;
+      -webkit-mask-repeat: no-repeat;
+    }
+    .ai-highlights li strong {
+      font-weight: 700;
+      color: var(--red-dark);
+    }
+    .ai-source-links {
+      margin-top: 14px;
+      padding-top: 14px;
+      border-top: 1px solid var(--light-grey);
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      align-items: center;
+    }
+    .ai-source-links span {
+      font-size: 12px;
+      color: var(--mid-grey);
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: .5px;
+    }
+    .source-pill {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--red);
+      border: 1px solid #e0b0b6;
+      border-radius: 20px;
+      padding: 3px 10px;
+      transition: background .2s;
+      cursor: pointer;
+    }
+    .source-pill:hover { background: var(--red-light); }
+
+    /* Disclaimer */
+    .ai-disclaimer {
+      margin-top: 14px;
+      background: #fffbf0;
+      border: 1px solid #ffe082;
+      border-radius: var(--radius);
+      padding: 10px 14px;
+      display: flex;
+      gap: 10px;
+      align-items: flex-start;
+      font-size: 12.5px;
+      color: #7a5800;
+      line-height: 1.5;
+    }
+    .ai-disclaimer .warn-icon { font-size: 15px; flex-shrink: 0; margin-top: 1px; }
+
+    /* ── Wikipedia card ────────────────────────────────────────────── */
+    .wiki-card {
+      background: var(--wiki-bg);
+      border: 1px solid #c8ccd1;
+      border-radius: var(--radius);
+      padding: 20px 24px;
+      margin-bottom: 28px;
+      animation: fadeUp .4s .1s ease both;
+    }
+    .wiki-header {
+      display: flex;
+      gap: 16px;
+      align-items: flex-start;
+      margin-bottom: 14px;
+    }
+    .wiki-photo {
+      flex-shrink: 0;
+      width: 72px;
+      height: 88px;
+      object-fit: cover;
+      border: 1px solid #c8ccd1;
+      border-radius: 2px;
+      background: #ddd;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 28px;
+      color: #aaa;
+      overflow: hidden;
+    }
+    .wiki-photo img { width: 100%; height: 100%; object-fit: cover; }
+    .wiki-title-block { flex: 1; }
+    .wiki-title {
+      font-family: var(--font-serif);
+      font-size: 18px;
+      font-weight: 700;
+      color: var(--charcoal);
+      margin-bottom: 2px;
+    }
+    .wiki-subtitle {
+      font-size: 13px;
+      color: var(--mid-grey);
+      font-style: italic;
+      margin-bottom: 8px;
+    }
+    .wiki-infobox {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px 20px;
+      font-size: 12.5px;
+    }
+    .wiki-fact { color: var(--mid-grey); }
+    .wiki-fact strong { color: var(--charcoal); font-weight: 600; }
+    .wiki-body {
+      font-size: 14px;
+      line-height: 1.7;
+      color: #3a3a3a;
+      border-top: 1px solid #c8ccd1;
+      padding-top: 14px;
+    }
+    .wiki-body p + p { margin-top: 10px; }
+    .wiki-footer {
+      margin-top: 12px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 12px;
+      color: var(--mid-grey);
+    }
+    .wiki-footer a {
+      color: var(--wiki-blue);
+      text-decoration: underline;
+      text-decoration-color: transparent;
+      transition: text-decoration-color .2s;
+    }
+    .wiki-footer a:hover { text-decoration-color: var(--wiki-blue); }
+    .wiki-logo {
+      font-size: 18px;
+    }
+
+    /* ── Results list ──────────────────────────────────────────────── */
+    .results-list {
+      display: flex;
+      flex-direction: column;
+      gap: 0;
+    }
+    .result-card {
+      background: var(--white);
+      border: 1px solid var(--light-grey);
+      border-radius: var(--radius);
+      padding: 20px 22px;
+      display: grid;
+      grid-template-columns: 1fr 110px;
+      gap: 16px;
+      align-items: start;
+      animation: fadeUp .3s ease both;
+      transition: box-shadow .2s, border-color .2s;
+      margin-bottom: -1px; /* flush borders */
+    }
+    .result-card:first-child { border-radius: var(--radius) var(--radius) 0 0; }
+    .result-card:last-child { border-radius: 0 0 var(--radius) var(--radius); margin-bottom: 0; }
+    .result-card:only-child { border-radius: var(--radius); }
+    .result-card:hover {
+      box-shadow: 0 4px 16px rgba(0,0,0,.1);
+      border-color: #ccc;
+      z-index: 1;
+      position: relative;
+    }
+    .result-card-body {}
+    .result-tag {
+      display: inline-block;
+      font-size: 10px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: .8px;
+      padding: 2px 8px;
+      border-radius: 2px;
+      margin-bottom: 8px;
+      color: #fff;
+    }
+    .tag-investigation { background: var(--tag-invest); }
+    .tag-report { background: var(--tag-report); }
+    .tag-daily { background: var(--tag-daily); }
+    .tag-analysis { background: var(--tag-analysis); }
+
+    .result-headline {
+      font-family: var(--font-serif);
+      font-size: 16px;
+      font-weight: 700;
+      line-height: 1.35;
+      color: var(--charcoal);
+      margin-bottom: 8px;
+      cursor: pointer;
+      transition: color .15s;
+    }
+    .result-headline:hover { color: var(--red); }
+
+    .result-meta {
+      font-size: 12px;
+      color: var(--mid-grey);
+      margin-bottom: 8px;
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+    .result-meta span { display: flex; align-items: center; gap: 4px; }
+    .result-excerpt {
+      font-size: 13.5px;
+      line-height: 1.6;
+      color: #555;
+    }
+    .result-excerpt mark {
+      background: #fff3b0;
+      color: inherit;
+      border-radius: 2px;
+      padding: 0 2px;
+    }
+    .result-thumb {
+      width: 110px;
+      height: 75px;
+      object-fit: cover;
+      border-radius: 3px;
+      background: var(--light-grey);
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 32px;
+      color: #bbb;
+      overflow: hidden;
+    }
+    .result-thumb img { width: 100%; height: 100%; object-fit: cover; }
+
+    /* ── Sidebar ───────────────────────────────────────────────────── */
+    /* ── Sidebar cards ─────────────────────────────────────────────── */
+
+    .sidebar-card {
+      background: var(--white);
+      border: 1px solid var(--light-grey);
+      border-radius: var(--radius);
+      overflow: hidden;
+      margin-bottom: 20px;
+    }
+    .sidebar-card-head {
+      background: var(--red);
+      color: #fff;
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      padding: 9px 14px;
+    }
+    .sidebar-card-body { padding: 14px; }
+
+    .related-topics { display: flex; flex-wrap: wrap; gap: 6px; }
+    .topic-tag {
+      font-size: 12px;
+      font-weight: 600;
+      border: 1px solid var(--light-grey);
+      border-radius: 20px;
+      padding: 4px 12px;
+      color: var(--mid-grey);
+      transition: all .15s;
+      cursor: pointer;
+    }
+    .topic-tag:hover {
+      border-color: var(--red);
+      color: var(--red);
+      background: var(--red-light);
+    }
+
+    /* ── Pagination ────────────────────────────────────────────────── */
+    .pagination {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      margin-top: 28px;
+    }
+    .page-btn {
+      width: 36px;
+      height: 36px;
+      border-radius: var(--radius);
+      border: 1px solid var(--light-grey);
+      background: var(--white);
+      font-size: 14px;
+      font-family: var(--font-sans);
+      color: var(--charcoal);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all .15s;
+    }
+    .page-btn:hover { border-color: var(--red); color: var(--red); }
+    .page-btn.active { background: var(--red); color: #fff; border-color: var(--red); }
+    .page-btn.wide { width: auto; padding: 0 14px; font-size: 13px; font-weight: 600; }
+
+
+
+    /* ── Animations ────────────────────────────────────────────────── */
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(12px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    .result-card:nth-child(1) { animation-delay: .0s; }
+    .result-card:nth-child(2) { animation-delay: .05s; }
+    .result-card:nth-child(3) { animation-delay: .10s; }
+    .result-card:nth-child(4) { animation-delay: .15s; }
+    .result-card:nth-child(5) { animation-delay: .20s; }
+    .result-card:nth-child(6) { animation-delay: .25s; }
+
+    /* ── Prototype banner ──────────────────────────────────────────── */
+    .prototype-banner {
+      background: #1a3a5c;
+      color: #cce0ff;
+      font-size: 12px;
+      text-align: center;
+      padding: 8px 24px;
+      letter-spacing: .2px;
+    }
+    .prototype-banner strong { color: #fff; }
+
+    /* ── Responsive ────────────────────────────────────────────────── */
+    @media (max-width: 860px) {
+      .page-wrap { grid-template-columns: 1fr; }
+      .sidebar { position: static; grid-column: 1; grid-row: auto; }
+      main { grid-column: 1; }
+      .result-card { grid-template-columns: 1fr; }
+      .result-thumb { width: 100%; height: 160px; }
+      .filter-dropdown { position: static; box-shadow: none; border: 1px solid #ddd; margin-top: 6px; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- Prototype indicator -->
+<div class="prototype-banner">
+  <strong>⚙ PROTOTYPE</strong> — This is a concept prototype for stakeholder review. Search functionality is not active; results are illustrative only.
+</div>
+
+<div class="page-wrap">
+
+  <!-- Row 1: Search heading — spans both columns -->
+  <div class="search-meta">
+    <h1>Results for <em>"Putin"</em></h1>
+    <span class="result-count">Showing 1–6 of 847 results</span>
+  </div>
+
+  <!-- Row 2: Filter bar — spans both columns -->
+  <div class="filter-bar-wrap">
+    <span class="filter-bar-label">Filter</span>
+    <div class="filter-tabs">
+
+      <div class="filter-tab">
+        <button class="filter-tab-btn" onclick="toggleTab(this)">
+          Content Type <span class="chevron">▾</span>
+        </button>
+        <div class="filter-dropdown">
+          <label class="filter-option"><input type="checkbox" checked /> Investigations <span class="filter-option-count">214</span></label>
+          <label class="filter-option"><input type="checkbox" checked /> Daily Stories <span class="filter-option-count">381</span></label>
+          <label class="filter-option"><input type="checkbox" /> Features <span class="filter-option-count">97</span></label>
+          <label class="filter-option"><input type="checkbox" /> Scoops <span class="filter-option-count">155</span></label>
+        </div>
+      </div>
+
+      <div class="filter-tab">
+        <button class="filter-tab-btn" onclick="toggleTab(this)">
+          <span class="tab-prefix">IN</span> Sections <span class="chevron">▾</span>
+        </button>
+        <div class="filter-dropdown">
+          <label class="filter-option"><input type="checkbox" /> Money Laundering <span class="filter-option-count">68</span></label>
+          <label class="filter-option"><input type="checkbox" /> Sanctions <span class="filter-option-count">44</span></label>
+          <label class="filter-option"><input type="checkbox" /> Shell Companies <span class="filter-option-count">31</span></label>
+        </div>
+      </div>
+
+      <div class="filter-tab">
+        <button class="filter-tab-btn" onclick="toggleTab(this)">
+          <span class="tab-prefix">IN</span> Regions <span class="chevron">▾</span>
+        </button>
+        <div class="filter-dropdown">
+          <label class="filter-option"><input type="checkbox" checked /> Russia <span class="filter-option-count">512</span></label>
+          <label class="filter-option"><input type="checkbox" /> Europe <span class="filter-option-count">203</span></label>
+          <label class="filter-option"><input type="checkbox" /> Middle East <span class="filter-option-count">44</span></label>
+        </div>
+      </div>
+
+      <div class="filter-tab">
+        <button class="filter-tab-btn" onclick="toggleTab(this)">
+          Date Range <span class="chevron">▾</span>
+        </button>
+        <div class="filter-dropdown">
+          <label class="filter-option"><input type="radio" name="date" /> Last 12 months</label>
+          <label class="filter-option"><input type="radio" name="date" checked /> Last 6 months</label>
+          <label class="filter-option"><input type="radio" name="date" /> All time</label>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Left sidebar: Wikipedia + Related Topics -->
+  <aside class="sidebar">
+
+    <div class="sidebar-card">
+      <div class="sidebar-card-head" style="display:flex;align-items:center;justify-content:space-between;">
+        <span>Wikipedia Overview</span>
+        <span class="badge badge-experimental" style="font-size:9px;padding:2px 7px;">Experimental</span>
+      </div>
+      <div class="sidebar-card-body" style="padding:14px;">
+        <div class="wiki-header" style="margin-bottom:12px;">
+          <div class="wiki-photo">
+            <svg viewBox="0 0 72 88" fill="none" xmlns="http://www.w3.org/2000/svg" width="72" height="88">
+              <rect width="72" height="88" fill="#e0e0e0"/>
+              <ellipse cx="36" cy="30" rx="14" ry="16" fill="#bbb"/>
+              <ellipse cx="36" cy="76" rx="26" ry="22" fill="#bbb"/>
+            </svg>
+          </div>
+          <div class="wiki-title-block">
+            <div class="wiki-title" style="font-size:15px;">Vladimir Putin</div>
+            <div class="wiki-subtitle">President of Russia</div>
+            <div class="wiki-infobox" style="flex-direction:column;gap:4px;">
+              <div class="wiki-fact"><strong>Born:</strong> 7 Oct 1952</div>
+              <div class="wiki-fact"><strong>In office:</strong> 2000–present</div>
+              <div class="wiki-fact"><strong>Party:</strong> United Russia</div>
+            </div>
+          </div>
+        </div>
+        <div class="wiki-body" style="font-size:13px;">
+          <p>Putin is a Russian politician and former KGB intelligence officer who has served as President of Russia since 2000. He is the longest-serving Russian leader since Joseph Stalin.</p>
+          <p style="margin-top:8px;">He has been sanctioned by numerous Western governments and indicted by the International Criminal Court in 2023.</p>
+        </div>
+        <div class="wiki-footer" style="margin-top:10px;">
+          <span class="wiki-logo">Ⓦ</span>
+          <a href="https://en.wikipedia.org/wiki/Vladimir_Putin" target="_blank">Wikipedia</a>
+          <span>· <a href="https://creativecommons.org/licenses/by-sa/4.0/" target="_blank">CC BY-SA 4.0</a></span>
+        </div>
+      </div>
+    </div>
+
+    <div class="sidebar-card">
+      <div class="sidebar-card-head">Related Topics</div>
+      <div class="sidebar-card-body">
+        <div class="related-topics">
+          <span class="topic-tag">Kleptocracy</span>
+          <span class="topic-tag">Panama Papers</span>
+          <span class="topic-tag">FSB</span>
+          <span class="topic-tag">Sanctions</span>
+          <span class="topic-tag">Prigozhin</span>
+          <span class="topic-tag">Wagner Group</span>
+          <span class="topic-tag">Ukraine War</span>
+          <span class="topic-tag">Shell Companies</span>
+          <span class="topic-tag">Navalny</span>
+          <span class="topic-tag">Offshore Finance</span>
+        </div>
+      </div>
+    </div>
+
+  </aside>
+
+  <!-- Right main: AI Summary + Results -->
+  <main>
+
+    <div class="section-label">
+      <h2>AI Summary</h2>
+      <span class="badge badge-experimental">Experimental</span>
+    </div>
+
+    <div class="ai-card">
+      <div class="ai-card-header">
+        <div class="ai-card-title">Key findings from OCCRP's reporting on Vladimir Putin</div>
+        <div class="ai-icon">✦</div>
+      </div>
+      <ul class="ai-highlights">
+        <li><div><strong>Hidden wealth through proxies.</strong> OCCRP traced assets worth nearly $24 billion held by Putin's family, boyhood friends, and loyal associates — individuals who appear to hold wealth on his behalf.</div></li>
+        <li><div><strong>Panama Papers and offshore networks.</strong> Close associates of Putin — including a senior Kremlin official and a cellist friend — were found to secretly control offshore companies that moved hundreds of millions of dollars.</div></li>
+        <li><div><strong>Loyalty rewarded with land and power.</strong> Former members of Putin's personal security detail were given land at steep discounts that had been seized from over 1,100 workers at a Moscow-area poultry plant.</div></li>
+      </ul>
+      <div class="ai-disclaimer">
+        <span class="warn-icon">⚠</span>
+        <span>This summary is generated automatically from OCCRP's published reporting. It is an experimental feature and may contain inaccuracies or omissions. Always consult the original articles for full context. OCCRP is not responsible for errors introduced by automated summarisation.</span>
+      </div>
+    </div>
+
+    <div class="section-label">
+      <h2>OCCRP Coverage</h2>
+    </div>
+
+    <div class="results-list">
+
+      <article class="result-card">
+        <div class="result-card-body">
+          <span class="result-tag tag-investigation">Investigation</span>
+          <div class="result-headline">Putin and the Proxies: Tracing the Hidden Wealth of Russia's President</div>
+          <div class="result-meta"><span>📅 12 Sep 2017</span><span>🌍 Russia</span><span>🏷 Kleptocracy · Shell Companies</span></div>
+          <div class="result-excerpt">OCCRP and Novaya Gazeta traced the assets of friends, family and loyal insiders linked to <mark>Putin</mark>, uncovering a combined fortune of nearly $24 billion that reporters believe may in part represent the president's own hidden wealth.</div>
+        </div>
+        <div class="result-thumb">🕵️</div>
+      </article>
+
+      <article class="result-card">
+        <div class="result-card-body">
+          <span class="result-tag tag-investigation">Investigation</span>
+          <div class="result-headline">The Panama Papers: Vladimir Putin's Circle and the Offshore Billions</div>
+          <div class="result-meta"><span>📅 3 Apr 2016</span><span>🌍 Russia · Panama</span><span>🏷 Panama Papers · Offshore Finance</span></div>
+          <div class="result-excerpt">The original Panama Papers investigation identified close associates of <mark>Putin</mark> — including a senior Kremlin official and a close personal friend — as owners of offshore companies that moved hundreds of millions of dollars.</div>
+        </div>
+        <div class="result-thumb">📄</div>
+      </article>
+
+      <article class="result-card">
+        <div class="result-card-body">
+          <span class="result-tag tag-investigation">Investigation</span>
+          <div class="result-headline">Putin's Bodyguards Rewarded with Land and Power</div>
+          <div class="result-meta"><span>📅 19 Nov 2018</span><span>🌍 Russia</span><span>🏷 Abuse of Power · Real Estate</span></div>
+          <div class="result-excerpt">Former members of <mark>Putin</mark>'s personal security detail received land at steep discounts in a Moscow suburb that had been seized from over 1,100 workers. The investigation illustrates how proximity to the president translates into material wealth.</div>
+        </div>
+        <div class="result-thumb">🏚️</div>
+      </article>
+
+      <article class="result-card">
+        <div class="result-card-body">
+          <span class="result-tag tag-report">Report</span>
+          <div class="result-headline">Telegram, the FSB, and the Man in the Middle</div>
+          <div class="result-meta"><span>📅 18 Mar 2025</span><span>🌍 Russia · Europe</span><span>🏷 Surveillance · Espionage</span></div>
+          <div class="result-excerpt">An OCCRP investigation found that a network provider connected to <mark>Putin</mark>'s presidential infrastructure supplied communications services linked to Russia's surveillance apparatus, raising questions about Telegram's security.</div>
+        </div>
+        <div class="result-thumb">📡</div>
+      </article>
+
+      <article class="result-card">
+        <div class="result-card-body">
+          <span class="result-tag tag-daily">Daily</span>
+          <div class="result-headline">US Treasury: Putin Has "Longstanding Practices" for Masking His Wealth</div>
+          <div class="result-meta"><span>📅 28 Jan 2016</span><span>🌍 Russia · USA</span><span>🏷 Sanctions · Corruption</span></div>
+          <div class="result-excerpt">US Treasury official Adam Szubin told the BBC that <mark>Putin</mark> draws a state salary of approximately $110,000 per year but has "longstanding training and practices" for concealing his actual wealth.</div>
+        </div>
+        <div class="result-thumb">🏛️</div>
+      </article>
+
+      <article class="result-card">
+        <div class="result-card-body">
+          <span class="result-tag tag-analysis">Analysis</span>
+          <div class="result-headline">Putin's Regime Targets Journalist's Family in Intimidation Campaign</div>
+          <div class="result-meta"><span>📅 5 Dec 2024</span><span>🌍 Russia</span><span>🏷 Press Freedom · Repression</span></div>
+          <div class="result-excerpt">Russian security forces searched the home of the parents of an OCCRP partner journalist after she fled Russia. The pattern underscores how <mark>Putin</mark>'s government targets families of journalists working abroad.</div>
+        </div>
+        <div class="result-thumb">📰</div>
+      </article>
+
+    </div>
+
+    <div class="pagination">
+      <button class="page-btn wide" disabled>← Prev</button>
+      <button class="page-btn active">1</button>
+      <button class="page-btn">2</button>
+      <button class="page-btn">3</button>
+      <span style="font-size:13px;color:var(--mid-grey);padding:0 4px">…</span>
+      <button class="page-btn">142</button>
+      <button class="page-btn wide">Next →</button>
+    </div>
+
+  </main>
+
+</div>
+
+<script>
+  function toggleTab(btn) {
+    const tab = btn.closest('.filter-tab');
+    const dropdown = tab.querySelector('.filter-dropdown');
+    const isOpen = dropdown.classList.contains('open');
+    document.querySelectorAll('.filter-dropdown').forEach(d => d.classList.remove('open'));
+    document.querySelectorAll('.filter-tab-btn').forEach(b => b.classList.remove('open'));
+    if (!isOpen) {
+      dropdown.classList.add('open');
+      btn.classList.add('open');
+    }
+  }
+  document.addEventListener('click', function(e) {
+    if (!e.target.closest('.filter-tab')) {
+      document.querySelectorAll('.filter-dropdown').forEach(d => d.classList.remove('open'));
+      document.querySelectorAll('.filter-tab-btn').forEach(b => b.classList.remove('open'));
+    }
+  });
+</script>
+</body>
+</html>
