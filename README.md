@@ -1,5 +1,5 @@
-# Search Results AI Summary — Design Prototype
-A prototype design for an AI Summary and Wikipedia Card to be displayed in the search results.
+# Enhanced Search Results with AI Summary
+A design prototype for an AI Summary and Wikipedia Card to be displayed in the search results.
 
 Live site can be visited here: [https://christriescoding.github.io/ai-search-prototype/index.html](https://christriescoding.github.io/ai-search-prototype/)
 
